@@ -42,38 +42,23 @@ class _RegisterView extends StatelessWidget {
   }
 }
 
-class _RegisterForm extends StatefulWidget {
+class _RegisterForm extends StatelessWidget {
   const _RegisterForm();
-
-  @override
-  State<_RegisterForm> createState() => _RegisterFormState();
-}
-
-class _RegisterFormState extends State<_RegisterForm> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
 
     final registerCubit = context.watch<RegisterCubit>();
+    final username = registerCubit.state.username;
+    final email = registerCubit.state.email;
+    final password = registerCubit.state.password;
 
     return Form(
-        key: _formKey,
         child: Column(
           children: [
             CustomTextFormField(
-              onChanged: (value) {
-                registerCubit.usernameChanged(value);
-                _formKey.currentState!.validate();
-              },
-              validator: (value) {
-                if (value!.isEmpty || value.trim().isEmpty) {
-                  return 'El nombre es requerido';
-                } else if (value.length < 6) {
-                  return 'El nombre debe tener al menos 6 caracteres';
-                }
-                return null;
-              },
+              onChanged: registerCubit.usernameChanged,
+              errorMessage: username.errorMessage,
               decoration: const InputDecoration(
                 labelText: 'Nombre',
                 hintText: 'Ingrese su nombre',
@@ -82,21 +67,8 @@ class _RegisterFormState extends State<_RegisterForm> {
             ),
             const SizedBox(height: 10),
             CustomTextFormField(
-              onChanged: (value) {
-                registerCubit.emailChanged(value);
-                _formKey.currentState!.validate();
-              },
-              validator: (value) {
-                final emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-                if (!emailRegExp.hasMatch(value!)) {
-                  return 'El correo no es válido';
-                } else if (value.isEmpty || value.trim().isEmpty) {
-                  return 'El correo es requerido';
-                } else if (value.length < 6) {
-                  return 'El correo debe tener al menos 6 caracteres';
-                }
-                return null;
-              },
+              onChanged: registerCubit.emailChanged,
+              errorMessage: email.errorMessage,
               decoration: const InputDecoration(
                 labelText: 'Correo',
                 hintText: 'Ingrese su correo',
@@ -105,18 +77,8 @@ class _RegisterFormState extends State<_RegisterForm> {
             ),
             const SizedBox(height: 10),
             CustomTextFormField(
-              onChanged: (value) {
-                registerCubit.passwordChanged(value);
-                _formKey.currentState!.validate();
-              },
-              validator: (value) {
-                if (value!.isEmpty || value.trim().isEmpty) {
-                  return 'El password es requerido';
-                } else if (value.length < 6) {
-                  return 'El password debe tener al menos 6 caracteres';
-                }
-                return null;
-              },
+              onChanged: registerCubit.passwordChanged,
+              errorMessage: password.errorMessage,
               obscureText: true,
               decoration: const InputDecoration(
                 labelText: 'Contraseña',
@@ -126,12 +88,7 @@ class _RegisterFormState extends State<_RegisterForm> {
             ),
             const SizedBox(height: 20),
             FilledButton.tonalIcon(
-                onPressed: () {
-                  final isValid = _formKey.currentState!.validate();
-                  if (!isValid) return;
-
-                  registerCubit.onSubmit();
-                },
+                onPressed: registerCubit.onSubmit,
                 icon: const Icon(Icons.save),
                 label: const Text('Crear usuario')),
             const SizedBox(height: 20),
